@@ -5,7 +5,12 @@ import matplotlib.image as mpimg
 import numpy as np
 import cv2
 
-def gbr_channel_scale(img, red, green, blue): #Actually G, B, R
+
+#This algo is good at detecting between two posts
+#Not at all useful for one post
+
+
+def gbr_channel_scale(img, red, green, blue): #Actually B, G, R
 	r, g, b = cv2.split(img)
 	npr = np.array(r) * red
 	npg = np.array(g) * green
@@ -23,12 +28,12 @@ cv2.imshow("img", img)
 
 gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
-boosted_img = gbr_channel_scale(img, 2, 1, 3)
+boosted_img = gbr_channel_scale(img, 1, 2, 3)
 if debug == "True":
 	cv2.imshow("boosted", boosted_img)
 
 
-edges = cv2.Canny(boosted_img,50,150,apertureSize = 3)
+edges = cv2.Canny(boosted_img, 50,150,apertureSize = 3)
 if debug == "True":
 	cv2.imshow("canny", edges)
 
