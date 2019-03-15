@@ -9,6 +9,7 @@ import cv2
 #This algo is good at detecting between two posts
 #Not at all useful for one post
 
+#Add try statement around K-means, if data isnt strong enough to reach criteria it will crash
 
 def gbr_channel_scale(img, red, green, blue): #Actually B, G, R
 	r, g, b = cv2.split(img)
@@ -22,24 +23,31 @@ if len(sys.argv) != 3:
 	print("Exiting...")
 	sys.exit()
 
-debug = sys.argv[2]
+debug = bool(sys.argv[2])
 img = cv2.imread(sys.argv[1], 1)
 cv2.imshow("img", img) 
 
-gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
 boosted_img = gbr_channel_scale(img, 1, 2, 3)
-if debug == "True":
+if debug == True:
 	cv2.imshow("boosted", boosted_img)
 
 
-edges = cv2.Canny(boosted_img, 50,150,apertureSize = 3)
-if debug == "True":
+
+kernel = np.ones((7,7), np.uint8)
+opened =  cv2.morphologyEx(boosted_img, cv2.MORPH_OPEN, kernel)
+if debug == True:
+	cv2.imshow('opening', opened)
+
+
+edges = cv2.Canny(opened, 50,150,apertureSize = 3)
+if debug == True:
 	cv2.imshow("canny", edges)
 
 
 
-lines = cv2.HoughLinesP(edges, rho=6, theta=np.pi / 60, threshold=160, lines=np.array([]), minLineLength=60, maxLineGap=25)
+
+lines = cv2.HoughLinesP(edges, rho=6, theta=np.pi / 60, threshold=100, lines=np.array([]), minLineLength=70, maxLineGap=35)
 verticallines = []
 horizontallines = []
 
@@ -54,7 +62,8 @@ for line in lines:
 		else:
 			horizontallines.append(line)
 			cv2.line(linesImage, (x1,y1), (x2,y2), (0,0,0), 3)
-if debug == "True":
+
+if debug == True:
 	cv2.imshow("lines", linesImage)
 
 floatLines = np.float32(verticallines)

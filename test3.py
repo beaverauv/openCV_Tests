@@ -37,39 +37,38 @@ cv2.imshow("img", img)
 blur = cv2.bilateralFilter(img, 9, 75, 75)
 
 blue, green, red = cv2.split(blur)
-cv2.imshow("red", red)
 
-redhsv = cv2.cvtColor(cv2.cvtColor(red, cv2.COLOR_GRAY2RGB), cv2.COLOR_RGB2HSV)
+#redhsv = cv2.cvtColor(cv2.cvtColor(red, cv2.COLOR_GRAY2RGB), cv2.COLOR_RGB2HSV)
 
-lower_red = np.array([0,0,int(np.percentile(red, 85))])
-upper_red = np.array([0,0,255])
+#lower_red = np.array([0,0,int(np.percentile(red, 85))])
+#upper_red = np.array([0,0,255])
 
-mask = cv2.inRange(redhsv, lower_red, upper_red)
+#mask = cv2.inRange(redhsv, lower_red, upper_red)
 
-res = cv2.bitwise_and(red,red, mask= mask)
+#res = cv2.bitwise_and(red,red, mask= mask)
 
 # Setup SimpleBlobDetector parameters.
 params = cv2.SimpleBlobDetector_Params()
  
 # Change thresholds
-params.minThreshold = 10;
+params.minThreshold = 0;
 params.maxThreshold = 255;
  
 # Filter by Area.
 params.filterByArea = True
-params.minArea = 500
+params.minArea = 250
  
 # Filter by Circularity
 params.filterByCircularity = False
 params.minCircularity = 0.1
  
 # Filter by Convexity
-params.filterByConvexity = True
+params.filterByConvexity = False
 params.minConvexity = 0.8
  
 # Filter by Inertia
 params.filterByInertia = False
-params.minInertiaRatio = 1
+params.maxInertiaRatio = 1
  
 # Create a detector with the parameters
 ver = (cv2.__version__).split('.')
@@ -77,16 +76,20 @@ if int(ver[0]) < 3 :
     detector = cv2.SimpleBlobDetector(params)
 else : 
     detector = cv2.SimpleBlobDetector_create(params)
-cv2.imshow("mask",mask)
+#cv2.imshow("mask",mask)
 
-keypoints = detector.detect(255-mask)
+keypoints = detector.detect(255-red)
+#keypoints = detector.detect(255-mask)
 
 print("I believe there are " + str(len(keypoints)) + " Poles")
 
-img_keypoints = np.empty((res.shape[0], res.shape[1], 3), dtype=np.uint8)
+img_keypoints = np.empty((img.shape[0], img.shape[1], 3), dtype=np.uint8)
+red_keypoints = np.empty((img.shape[0], img.shape[1], 3), dtype=np.uint8)
 cv2.drawKeypoints(img, keypoints, img_keypoints)
+cv2.drawKeypoints(red, keypoints, red_keypoints)
 #-- Show detected (drawn) keypoints
-cv2.imshow('SURF Keypoints', img_keypoints)
+cv2.imshow('Keypoints', img_keypoints)
+cv2.imshow("red keypoints", red_keypoints)
 
 #cv2.imshow('final', detector)
 
