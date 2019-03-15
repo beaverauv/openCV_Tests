@@ -2,7 +2,12 @@
 #It works by using blob detection on the red channel
 #Also has a few other things to discriminate
 
+#ARGUEMENTS:
+#img - (np array), the image in bgr format to check
+#debug - (bool) [False], whether there is an ouput for the steps
 
+#RETURNS:
+#int - the number of poles
 
 import sys
 import copy
