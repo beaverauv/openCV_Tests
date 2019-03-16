@@ -1,13 +1,16 @@
 #This algo is good at detecting between two posts
 #Not at all useful for one post, so must be after number poles function
-#Add try statement around K-means, if data isnt strong enough to reach criteria it will crash
+#If Kmeans fails, it will return everything normally except -1 as the middle location
 
 #ARGUEMENTS:
 #img - (np array), the image in bgr format to check
 #debug - (bool) [False], whether there is an ouput for the steps
 
 #RETURNS:
-#int, float - number of pixels wide, fraction of distance (0. is left, .5 is middle, 1. is right) where the middle of the gate is
+#int, float, np.arry
+#number of pixels wide
+#x coord of the middle
+#the resulting image with gate highlighted
 
 import sys
 import copy
@@ -54,7 +57,12 @@ def execute(img, debug=False):
 
 	# define criteria and apply kmeans()
 	criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-	ret,label,center=cv2.kmeans(floatLines,2,None,criteria,10,cv2.KMEANS_RANDOM_CENTERS)
+	try:
+		ret,label,center=cv2.kmeans(floatLines,2,None,criteria,10,cv2.KMEANS_RANDOM_CENTERS)
+	except Exception as e:
+		print("K Means Failed: Returning to advoid crash...")
+		print(e)
+		return img.shape[1], -1, img
 
 	topLeft = None
 	topRight = None
@@ -69,24 +77,23 @@ def execute(img, debug=False):
 	else:
 		topRight = 3
 
+	cv2.line(img, (center[0][topLeft-1],center[0][topLeft]), (center[1][topRight-1],center[1][topRight]), (0,0,255), 3)
+	cv2.line(img, (center[0][0],center[0][1]), (center[0][2],center[0][3]), (255,0,0), 3)
+	cv2.line(img, (center[1][0],center[1][1]), (center[1][2],center[1][3]), (0,255,0), 3)
+
+	cv2.circle(img, (center[0][0], center[0][1]), 5, (255,255,255), -1)
+	cv2.circle(img, (center[0][2], center[0][3]), 5, (255,255,255), -1)
+	cv2.circle(img, (center[1][0], center[1][1]), 5, (255,255,255), -1)
+	cv2.circle(img, (center[1][2], center[1][3]), 5, (255,255,255), -1)
+	
 	if debug == True:
-		cv2.line(img, (center[0][topLeft-1],center[0][topLeft]), (center[1][topRight-1],center[1][topRight]), (0,0,255), 3)
-		cv2.line(img, (center[0][0],center[0][1]), (center[0][2],center[0][3]), (255,0,0), 3)
-		cv2.line(img, (center[1][0],center[1][1]), (center[1][2],center[1][3]), (0,255,0), 3)
-
-
-		cv2.circle(img, (center[0][0], center[0][1]), 5, (255,255,255), -1)
-		cv2.circle(img, (center[0][2], center[0][3]), 5, (255,255,255), -1)
-		cv2.circle(img, (center[1][0], center[1][1]), 5, (255,255,255), -1)
-		cv2.circle(img, (center[1][2], center[1][3]), 5, (255,255,255), -1)
-
 		cv2.imshow("boosted", boosted_img)
 		cv2.imshow('opening', opened)
 		cv2.imshow("canny", edges)
 		cv2.imshow("lines", linesImage)
 		cv2.imshow('final',img)
 
-	return img.shape[1], int((center[0][topLeft-1] + center[1][topRight-1])/2)
+	return img.shape[1], int((center[0][topLeft-1] + center[1][topRight-1])/2), img
 
 
 #Allows the file to be executed and tested on its own
