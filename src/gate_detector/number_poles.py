@@ -65,8 +65,7 @@ def execute(img, debug=False):
 	return len(keypoints)
 
 
-
-
+#Allows the file to be executed and tested on its own
 if __name__ == "__main__":
 	if len(sys.argv) != 3:
 		print("This test requires arguements: python test2.py [path_to_image (string)] [debug (bool)]")
