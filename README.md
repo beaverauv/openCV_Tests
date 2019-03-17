@@ -1,7 +1,11 @@
-Messing around with openCV...
+# Prototype Code for our Sub's Vision
+## Features:
+- Modular as each file basically equates to one function
+- Each file can be ran on its own
+- Ok gate detection (in progress)
+- Scaffolding for future tasks
 
--Can detect the left and right post to a good enough extent to go towards middle
--Messes up at closeup since it things that the left and right side of a single pole is the right and left pole
-
-Future:
--Color masks to detect shape and deduce poles from there instead of clusters of lines
+## Usage:
+- All importable
+- Individual files can be ran with:
+> python [file].py [path_to_image] [debug]
